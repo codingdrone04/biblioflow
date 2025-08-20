@@ -2,6 +2,8 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: biblioflow-postgres-dev
+    env_file:
+      - .env.dev
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -20,6 +22,8 @@ services:
   mongo:
     image: mongo:7
     container_name: biblioflow-mongo-dev
+    env_file:
+      - .env.dev
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
@@ -39,6 +43,8 @@ services:
       context: ./back
       dockerfile: dockerfile.dev
     container_name: biblioflow-backend-dev
+    env_file:
+      - .env.dev
     environment:
       NODE_ENV: development
       JWT_SECRET: ${JWT_SECRET}
@@ -58,6 +64,9 @@ services:
     ports:
       - "3001:3000"
       - "9229:9229"
+    restart: unless-stopped
+    tmpfs:
+      - /tmp
     labels:
       - "dev.environment=development"
       - "dev.service=backend"
@@ -68,6 +77,8 @@ services:
       context: ./front
       dockerfile: dockerfile.dev
     container_name: biblioflow-frontend-dev
+    env_file:
+      - .env.dev
     depends_on:
       - backend
     volumes:
@@ -78,6 +89,8 @@ services:
     environment:
       - NODE_ENV=development
       - NG_CLI_ANALYTICS=false
+      - CHOKIDAR_USEPOLLING=true
+    restart: unless-stopped
     labels:
       - "dev.environment=development"
       - "dev.service=frontend"
